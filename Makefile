@@ -1,22 +1,26 @@
+GO ?= /opt/homebrew/bin/go
+export GOROOT := /opt/homebrew/Cellar/go/1.26.1/libexec
+unexport GOBIN
+
 .PHONY: all build test test-race vet clean loc
 
 all: build test
 
 build:
-	go build ./...
+	$(GO) build ./...
 
 test:
-	go test -v ./...
+	$(GO) test -v ./...
 
 test-race:
-	go test -race ./...
+	$(GO) test -race ./...
 
 vet:
-	go vet ./...
+	$(GO) vet ./...
 
 loc:
-	@python3 -c "import generator.loc as l; res=l.get_production_loc('.'); print(f'Production LOC: {res["code"]}')"
+	@python3 -c "import generator.loc as l; res=l.get_production_loc('.'); print(f'Production LOC: {res[\"code\"]}')"
 
 clean:
-	go clean
+	$(GO) clean
 	rm -rf bin/

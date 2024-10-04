@@ -1,17 +1,17 @@
 # KestrelFlow Execution Plan & Progress Tracker
 
 ## Status Summary
-- **Current Phase**: Phase 0 Complete
-- **Total Commits**: 6
-- **Production LOC**: 0
+- **Current Phase**: Phase 1 Complete (Phase 2 In Progress)
+- **Total Commits**: 17
+- **Production LOC**: 1719
 
 ## Phase Progress Table
 
 | Phase | Description | Status | Target Checkpoint | Verified Checkpoint |
 |---|---|---|---|---|
 | 0 | Scaffold & Architecture | COMPLETED | DESIGN.md exists, 16 subsystems assigned package paths | Verified; DESIGN.md committed, all paths mapped |
-| 1 | Core Domain, State Machine & Persistence | IN_PROGRESS | go build ./... succeeds; table-driven tests covering legal + illegal transitions | Pending |
-| 2 | Scheduler, Worker Pool & Concurrency | PENDING | Concurrency-heavy packages have -race-clean tests with real goroutines | Pending |
+| 1 | Core Domain, State Machine & Persistence | COMPLETED | go build ./... succeeds; table-driven tests covering legal + illegal transitions | Verified; all legal + 8 illegal transitions tested and passing |
+| 2 | Scheduler, Worker Pool & Concurrency | IN_PROGRESS | Concurrency-heavy packages have -race-clean tests with real goroutines | Pending |
 | 3 | HTTP REST & gRPC API Surfaces | PENDING | Every endpoint has boundary/negative-case test | Pending |
 | 4 | CLI & Configuration Layer | PENDING | Config precedence tests for conflicting sources (flag > env > file > default) | Pending |
 | 5 | Plugin Interface & Webhooks | PENDING | Round-trip serialization tests for every event type | Pending |
@@ -24,4 +24,4 @@
 | 12 | Final Documentation & Polish | PENDING | DoD checklist 100% satisfied | Pending |
 
 ## Deviations Log
-- None to date.
+- None.
