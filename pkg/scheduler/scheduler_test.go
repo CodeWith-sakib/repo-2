@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/kestrelflow/kestrelflow/pkg/core"
-	"github.com/kestrelflow/kestrelflow/pkg/storage"
 	"github.com/kestrelflow/kestrelflow/pkg/storage/memory"
 )
 
@@ -48,6 +47,7 @@ func TestSchedulerDiamondDAG(t *testing.T) {
 		t.Fatalf("expected step-a in queue, got %v", tasks)
 	}
 	_ = store.AckTask(ctx, tasks[0].ID, "w1")
+	_ = sched.HandleStepStarted(ctx, run.ID, "step-a", "w1")
 
 	// Complete step-a
 	if err := sched.HandleStepCompleted(ctx, run.ID, "step-a", []byte(`{"status":"ok"}`)); err != nil {
@@ -64,6 +64,7 @@ func TestSchedulerDiamondDAG(t *testing.T) {
 	for _, task := range tasks {
 		_ = store.AckTask(ctx, task.ID, "w1")
 		if task.StepID == "step-b" {
+			_ = sched.HandleStepStarted(ctx, run.ID, "step-b", "w1")
 			_ = sched.HandleStepCompleted(ctx, run.ID, "step-b", nil)
 		}
 	}
@@ -75,6 +76,7 @@ func TestSchedulerDiamondDAG(t *testing.T) {
 	}
 
 	// Complete step-c
+	_ = sched.HandleStepStarted(ctx, run.ID, "step-c", "w1")
 	_ = sched.HandleStepCompleted(ctx, run.ID, "step-c", nil)
 
 	// Now step-d must be enqueued
@@ -83,8 +85,10 @@ func TestSchedulerDiamondDAG(t *testing.T) {
 		t.Fatalf("expected step-d enqueued, got %v", tasks)
 	}
 	_ = store.AckTask(ctx, tasks[0].ID, "w1")
+	_ = sched.HandleStepStarted(ctx, run.ID, "step-a", "w1")
 
 	// Complete step-d
+	_ = sched.HandleStepStarted(ctx, run.ID, "step-d", "w1")
 	_ = sched.HandleStepCompleted(ctx, run.ID, "step-d", nil)
 
 	// Workflow should now be COMPLETED

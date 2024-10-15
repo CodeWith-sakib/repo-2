@@ -170,6 +170,36 @@ func (s *Scheduler) enqueueStep(ctx context.Context, run *core.WorkflowRun, step
 	return s.store.EnqueueTask(ctx, task)
 }
 
+
+func (s *Scheduler) HandleStepStarted(ctx context.Context, runID core.ID, stepID string, workerID string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	sr, err := s.store.GetStepRunByStepID(ctx, runID, stepID)
+	if err != nil {
+		return err
+	}
+
+	if err := s.sm.TransitionStep(sr, core.StepStateRunning); err != nil {
+		return err
+	}
+	sr.WorkerID = workerID
+	now := time.Now().UTC()
+	sr.StartedAt = &now
+	if err := s.store.UpdateStepRun(ctx, sr); err != nil {
+		return err
+	}
+
+	_ = s.store.AppendEvent(ctx, &core.Event{
+		Type:      core.EventStepStarted,
+		TenantID:  sr.StepID,
+		RunID:     runID,
+		StepID:    stepID,
+		Timestamp: now,
+	})
+	return nil
+}
+
 func (s *Scheduler) HandleStepCompleted(ctx context.Context, runID core.ID, stepID string, output json.RawMessage) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()

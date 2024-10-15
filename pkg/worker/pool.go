@@ -2,7 +2,6 @@ package worker
 
 import (
 	"context"
-	"fmt"
 	"sync"
 	"time"
 
@@ -166,6 +165,8 @@ func (p *Pool) processTask(ctx context.Context, task *storage.QueuedTask) {
 		_ = p.scheduler.HandleStepFailed(ctx, task.RunID, task.StepID, err.Error())
 		return
 	}
+
+	_ = p.scheduler.HandleStepStarted(taskCtx, task.RunID, task.StepID, p.cfg.WorkerID)
 
 	sctx := StepContext{
 		RunID:    string(task.RunID),

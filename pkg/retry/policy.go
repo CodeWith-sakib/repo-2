@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/kestrelflow/kestrelflow/pkg/core"
 )
 
 type NonRetryableError struct {

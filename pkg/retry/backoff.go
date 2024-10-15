@@ -1,7 +1,6 @@
 package retry
 
 import (
-	"context"
 	"math"
 	"math/rand"
 	"sync"
