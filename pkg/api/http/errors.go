@@ -17,7 +17,7 @@ func WriteError(w http.ResponseWriter, r *http.Request, err error) {
 	if errors.Is(err, core.ErrNotFound) {
 		status = http.StatusNotFound
 		title = "Resource Not Found"
-	} else if errors.Is(err, core.ErrValidationFailed) {
+	} else if errors.Is(err, core.ErrValidationFailed) || errors.Is(err, core.ErrCycleDetected) {
 		status = http.StatusBadRequest
 		title = "Bad Request"
 	} else if errors.Is(err, core.ErrAlreadyExists) {
