@@ -5,14 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"net/http"
+	stdhttp "net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
-	"github.com/kestrelflow/kestrelflow/pkg/api/http"
-	"github.com/kestrelflow/kestrelflow/pkg/api/types"
+	apihttp "github.com/kestrelflow/kestrelflow/pkg/api/http"
 	"github.com/kestrelflow/kestrelflow/pkg/config"
 	"github.com/kestrelflow/kestrelflow/pkg/core"
 	"github.com/kestrelflow/kestrelflow/pkg/scheduler"
@@ -64,7 +63,7 @@ func (c *CLI) Execute(args []string) int {
 }
 
 func (c *CLI) printUsage() {
-	fmt.Fprintln(c.Out, `KestrelFlow - Distributed Workflow Orchestration Engine
+	fmt.Fprint(c.Out, `KestrelFlow - Distributed Workflow Orchestration Engine
 
 Usage:
   kestrel <command> [arguments]
@@ -87,7 +86,7 @@ func (c *CLI) runServer(args []string) int {
 
 	store := memory.NewStore()
 	sched := scheduler.NewScheduler(store, cfg.Worker.PollInterval)
-	srv := http.NewServer(store, sched)
+	srv := apihttp.NewServer(store, sched)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()

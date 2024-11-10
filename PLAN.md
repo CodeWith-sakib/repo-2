@@ -1,9 +1,9 @@
 # KestrelFlow Execution Plan & Progress Tracker
 
 ## Status Summary
-- **Current Phase**: Phase 3 Complete (Phase 4 In Progress)
-- **Total Commits**: 26
-- **Production LOC**: 3047
+- **Current Phase**: Phase 4 Complete (Phase 5 In Progress)
+- **Total Commits**: 29
+- **Production LOC**: 3402
 
 ## Phase Progress Table
 
@@ -13,8 +13,8 @@
 | 1 | Core Domain, State Machine & Persistence | COMPLETED | go build ./... succeeds; table-driven tests covering legal + illegal transitions | Verified; all legal + 8 illegal transitions tested and passing |
 | 2 | Scheduler, Worker Pool & Concurrency | COMPLETED | Concurrency-heavy packages have -race-clean tests with real goroutines | Verified; pkg/worker, pkg/scheduler, and pkg/retry are -race clean |
 | 3 | HTTP REST & gRPC API Surfaces | COMPLETED | Every endpoint has boundary/negative-case test | Verified; all endpoints have negative/boundary tests passing |
-| 4 | CLI & Configuration Layer | IN_PROGRESS | Config precedence tests for conflicting sources (flag > env > file > default) | Pending |
-| 5 | Plugin Interface & Webhooks | PENDING | Round-trip serialization tests for every event type | Pending |
+| 4 | CLI & Configuration Layer | COMPLETED | Config precedence tests for conflicting sources (flag > env > file > default) | Verified; TestConfigPrecedence explicitly tests all 4 conflicting tiers |
+| 5 | Plugin Interface & Webhooks | IN_PROGRESS | Round-trip serialization tests for every event type | Pending |
 | 6 | Observability, Cache & Dashboard | PENDING | Cache invalidation integration tests; dashboard renders in test | Pending |
 | 7 | Hardening & Resource Audits | PENDING | No TODO/FIXME left; go vet and staticcheck clean | Pending |
 | 8 | Test-Suite Completion & Fuzzing | PENDING | All 8 test categories covered; fuzz targets run | Pending |
