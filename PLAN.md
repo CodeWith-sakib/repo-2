@@ -1,9 +1,9 @@
 # KestrelFlow Execution Plan & Progress Tracker
 
 ## Status Summary
-- **Current Phase**: Phase 4 Complete (Phase 5 In Progress)
-- **Total Commits**: 29
-- **Production LOC**: 3402
+- **Current Phase**: Phase 5 Complete (Phase 6 In Progress)
+- **Total Commits**: 35
+- **Production LOC**: 3796
 
 ## Phase Progress Table
 
@@ -14,8 +14,8 @@
 | 2 | Scheduler, Worker Pool & Concurrency | COMPLETED | Concurrency-heavy packages have -race-clean tests with real goroutines | Verified; pkg/worker, pkg/scheduler, and pkg/retry are -race clean |
 | 3 | HTTP REST & gRPC API Surfaces | COMPLETED | Every endpoint has boundary/negative-case test | Verified; all endpoints have negative/boundary tests passing |
 | 4 | CLI & Configuration Layer | COMPLETED | Config precedence tests for conflicting sources (flag > env > file > default) | Verified; TestConfigPrecedence explicitly tests all 4 conflicting tiers |
-| 5 | Plugin Interface & Webhooks | IN_PROGRESS | Round-trip serialization tests for every event type | Pending |
-| 6 | Observability, Cache & Dashboard | PENDING | Cache invalidation integration tests; dashboard renders in test | Pending |
+| 5 | Plugin Interface & Webhooks | COMPLETED | Round-trip serialization tests for every event type | Verified; TestEventRoundTripSerialization covers all 16 event types |
+| 6 | Observability, Cache & Dashboard | IN_PROGRESS | Cache invalidation integration tests; dashboard renders in test | Pending |
 | 7 | Hardening & Resource Audits | PENDING | No TODO/FIXME left; go vet and staticcheck clean | Pending |
 | 8 | Test-Suite Completion & Fuzzing | PENDING | All 8 test categories covered; fuzz targets run | Pending |
 | 9 | Clean Golden Baseline | PENDING | All checks pass 100% green; tagged v1.0.0-golden | Pending |

@@ -1,28 +1,40 @@
 package webhook
 
 import (
+	"bytes"
 	"context"
+	"io"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 	"time"
 
 	"github.com/kestrelflow/kestrelflow/pkg/core"
 )
 
+type roundTripperFunc func(req *http.Request) (*http.Response, error)
+
+func (f roundTripperFunc) RoundTrip(req *http.Request) (*http.Response, error) {
+	return f(req)
+}
+
 func TestWebhookDeliveryWithHMAC(t *testing.T) {
 	secret := "test-secret-key-1234"
 	var receivedSig string
-	var receivedEvent core.EventType
+	var receivedEvent string
 
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		receivedSig = r.Header.Get("X-Kestrel-Signature")
-		receivedEvent = core.EventType(r.Header.Get("X-Kestrel-Event"))
-		w.WriteHeader(http.StatusOK)
-	}))
-	defer server.Close()
+	mockClient := &http.Client{
+		Transport: roundTripperFunc(func(req *http.Request) (*http.Response, error) {
+			receivedSig = req.Header.Get("X-Kestrel-Signature")
+			receivedEvent = req.Header.Get("X-Kestrel-Event")
+			return &http.Response{
+				StatusCode: http.StatusOK,
+				Body:       io.NopCloser(bytes.NewReader([]byte(`{"status":"received"}`))),
+				Header:     make(http.Header),
+			}, nil
+		}),
+	}
 
-	dispatcher := NewDispatcher(server.Client())
+	dispatcher := NewDispatcher(mockClient)
 	event := &core.Event{
 		ID:        core.NewID("evt"),
 		Type:      core.EventRunCompleted,
@@ -33,7 +45,7 @@ func TestWebhookDeliveryWithHMAC(t *testing.T) {
 
 	target := Target{
 		ID:        "target-1",
-		URL:       server.URL,
+		URL:       "https://webhook.internal/events",
 		SecretKey: secret,
 	}
 
@@ -41,10 +53,31 @@ func TestWebhookDeliveryWithHMAC(t *testing.T) {
 		t.Fatalf("webhook dispatch failed: %v", err)
 	}
 
-	if receivedEvent != core.EventRunCompleted {
+	if receivedEvent != string(core.EventRunCompleted) {
 		t.Errorf("expected event %s, got %s", core.EventRunCompleted, receivedEvent)
 	}
 	if receivedSig == "" {
 		t.Error("expected HMAC signature in request, got empty")
+	}
+
+	// Verify dead letter queue on 500 error
+	errorClient := &http.Client{
+		Transport: roundTripperFunc(func(req *http.Request) (*http.Response, error) {
+			return &http.Response{
+				StatusCode: http.StatusInternalServerError,
+				Body:       io.NopCloser(bytes.NewReader([]byte(`server error`))),
+				Header:     make(http.Header),
+			}, nil
+		}),
+	}
+	errDispatcher := NewDispatcher(errorClient)
+	_ = errDispatcher.Dispatch(context.Background(), target, event)
+
+	dls := errDispatcher.DeadLetters()
+	if len(dls) != 1 {
+		t.Fatalf("expected 1 dead letter after failure, got %d", len(dls))
+	}
+	if dls[0].TargetID != "target-1" {
+		t.Errorf("dead letter target mismatch: %s", dls[0].TargetID)
 	}
 }
