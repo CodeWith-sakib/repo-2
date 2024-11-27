@@ -1,9 +1,9 @@
 # KestrelFlow Execution Plan & Progress Tracker
 
 ## Status Summary
-- **Current Phase**: Phase 5 Complete (Phase 6 In Progress)
-- **Total Commits**: 35
-- **Production LOC**: 3796
+- **Current Phase**: Phase 6 Complete (Phase 7 In Progress)
+- **Total Commits**: 40
+- **Production LOC**: 4154
 
 ## Phase Progress Table
 
@@ -15,8 +15,8 @@
 | 3 | HTTP REST & gRPC API Surfaces | COMPLETED | Every endpoint has boundary/negative-case test | Verified; all endpoints have negative/boundary tests passing |
 | 4 | CLI & Configuration Layer | COMPLETED | Config precedence tests for conflicting sources (flag > env > file > default) | Verified; TestConfigPrecedence explicitly tests all 4 conflicting tiers |
 | 5 | Plugin Interface & Webhooks | COMPLETED | Round-trip serialization tests for every event type | Verified; TestEventRoundTripSerialization covers all 16 event types |
-| 6 | Observability, Cache & Dashboard | IN_PROGRESS | Cache invalidation integration tests; dashboard renders in test | Pending |
-| 7 | Hardening & Resource Audits | PENDING | No TODO/FIXME left; go vet and staticcheck clean | Pending |
+| 6 | Observability, Cache & Dashboard | COMPLETED | Cache invalidation integration tests; dashboard renders in test | Verified; cache tests and in-memory dashboard render tests passing |
+| 7 | Hardening & Resource Audits | IN_PROGRESS | No TODO/FIXME left; go vet and staticcheck clean | Pending |
 | 8 | Test-Suite Completion & Fuzzing | PENDING | All 8 test categories covered; fuzz targets run | Pending |
 | 9 | Clean Golden Baseline | PENDING | All checks pass 100% green; tagged v1.0.0-golden | Pending |
 | 10 | Defect Catalog & Injections | PENDING | 30-36 candidate defects in manifest; atomic revertible commits | Pending |

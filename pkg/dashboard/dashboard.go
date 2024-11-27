@@ -3,7 +3,6 @@ package dashboard
 import (
 	"html/template"
 	"net/http"
-	"time"
 
 	"github.com/kestrelflow/kestrelflow/pkg/core"
 	"github.com/kestrelflow/kestrelflow/pkg/storage"
