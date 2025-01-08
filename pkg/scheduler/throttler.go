@@ -69,11 +69,11 @@ func (g *ConcurrencyGovernor) Acquire(ctx context.Context, tenant string) error 
 	}
 
 	if limit.MaxConcurrent > 0 && st.activeCount >= limit.MaxConcurrent {
-		return fmt.Errorf("%w: tenant %s exceeded max concurrency of %d", core.ErrExecutionFailed, tenant, limit.MaxConcurrent)
+		return fmt.Errorf("%w: tenant %s exceeded max concurrency of %d", core.ErrRateLimited, tenant, limit.MaxConcurrent)
 	}
 
 	if st.tokens < 1.0 {
-		return fmt.Errorf("%w: tenant %s exceeded rate limit", core.ErrExecutionFailed, tenant)
+		return fmt.Errorf("%w: tenant %s exceeded rate limit", core.ErrRateLimited, tenant)
 	}
 
 	st.tokens -= 1.0

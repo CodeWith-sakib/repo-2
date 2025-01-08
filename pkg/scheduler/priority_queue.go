@@ -5,7 +5,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/kestrelflow/kestrelflow/pkg/core"
 	"github.com/kestrelflow/kestrelflow/pkg/storage"
 )
 

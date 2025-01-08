@@ -102,7 +102,7 @@ func (l *Lexer) NextToken() (Token, error) {
 		return Token{Type: TokenOr, Value: "||", Pos: l.pos - 2}, nil
 	}
 
-	if ch == '"' || ch == ''' {
+	if ch == '"' || ch == 39 {
 		return l.lexString(ch)
 	}
 

@@ -1,7 +1,6 @@
 package http
 
 import (
-	"bytes"
 	"compress/gzip"
 	"io"
 	"net/http"

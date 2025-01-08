@@ -1,7 +1,6 @@
 package memory
 
 import (
-	"context"
 	"fmt"
 	"sync"
 	"time"
@@ -147,7 +146,8 @@ func (tx *MVCCTransaction) Commit() error {
 	}
 
 	commitTime := time.Now().UTC()
-	commitVer := tx.txID
+	s.globalTxID++
+	commitVer := s.globalTxID
 
 	for k, v := range tx.writes {
 		rec := &VersionedRecord{

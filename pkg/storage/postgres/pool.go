@@ -3,7 +3,6 @@ package postgres
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"sync"
 	"sync/atomic"
 	"time"

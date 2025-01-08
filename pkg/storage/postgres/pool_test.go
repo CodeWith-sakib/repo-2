@@ -2,7 +2,6 @@ package postgres
 
 import (
 	"testing"
-	"time"
 )
 
 func TestPoolMonitorStats(t *testing.T) {
