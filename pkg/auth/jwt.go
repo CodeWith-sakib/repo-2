@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-type Claims struct {
+type JWTClaims struct {
 	Subject   string   `json:"sub"`
 	Role      Role     `json:"role"`
 	TenantID  string   `json:"tenant_id,omitempty"`
@@ -27,7 +27,7 @@ func NewJWTManager(secret string) *JWTManager {
 	return &JWTManager{secret: []byte(secret)}
 }
 
-func (m *JWTManager) Sign(claims Claims) (string, error) {
+func (m *JWTManager) Sign(claims JWTClaims) (string, error) {
 	headerJSON, _ := json.Marshal(map[string]string{
 		"alg": "HS256",
 		"typ": "JWT",
@@ -47,7 +47,7 @@ func (m *JWTManager) Sign(claims Claims) (string, error) {
 	return fmt.Sprintf("%s.%s", unsignedToken, sigB64), nil
 }
 
-func (m *JWTManager) Verify(tokenStr string) (*Claims, error) {
+func (m *JWTManager) Verify(tokenStr string) (*JWTClaims, error) {
 	parts := strings.Split(tokenStr, ".")
 	if len(parts) != 3 {
 		return nil, errors.New("invalid jwt token format")
@@ -69,7 +69,7 @@ func (m *JWTManager) Verify(tokenStr string) (*Claims, error) {
 		return nil, errors.New("invalid claims encoding")
 	}
 
-	var claims Claims
+	var claims JWTClaims
 	if err := json.Unmarshal(claimsBytes, &claims); err != nil {
 		return nil, err
 	}

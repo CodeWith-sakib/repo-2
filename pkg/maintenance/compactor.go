@@ -6,7 +6,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/kestrelflow/kestrelflow/pkg/core"
 	"github.com/kestrelflow/kestrelflow/pkg/storage"
 )
 
@@ -24,12 +23,12 @@ type CompactionStats struct {
 }
 
 type HistoryCompactor struct {
-	store  storage.Store
+	store  storage.RunStore
 	policy CompactionPolicy
 	mu     sync.Mutex
 }
 
-func NewHistoryCompactor(store storage.Store, policy CompactionPolicy) *HistoryCompactor {
+func NewHistoryCompactor(store storage.RunStore, policy CompactionPolicy) *HistoryCompactor {
 	if policy.RetentionPeriod <= 0 {
 		policy.RetentionPeriod = 30 * 24 * time.Hour // 30 days
 	}
@@ -50,8 +49,8 @@ func (c *HistoryCompactor) Compact(ctx context.Context) (*CompactionStats, error
 	stats := &CompactionStats{}
 	cutoff := time.Now().Add(-c.policy.RetentionPeriod)
 
-	runs, err := c.store.ListRuns(ctx, storage.RunFilter{
-		Limit: c.policy.BatchSize,
+	runs, _, err := c.store.ListRuns(ctx, storage.RunFilter{
+		Pagination: storage.Pagination{Limit: c.policy.BatchSize},
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed listing runs for compaction: %w", err)
@@ -62,7 +61,7 @@ func (c *HistoryCompactor) Compact(ctx context.Context) (*CompactionStats, error
 		if !r.State.IsTerminal() {
 			continue
 		}
-		if r.CompletedAt != nil && r.CompletedAt.Before(cutoff) {
+		if r.FinishedAt != nil && r.FinishedAt.Before(cutoff) {
 			if !c.policy.DryRun {
 				// Delete or archive terminal run
 				stats.RunsPruned++

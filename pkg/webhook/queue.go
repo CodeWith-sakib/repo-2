@@ -1,7 +1,6 @@
 package webhook
 
 import (
-	"context"
 	"fmt"
 	"sync"
 	"time"

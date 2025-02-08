@@ -8,6 +8,7 @@ import (
 )
 
 func TestPropertyStateMachineTerminalImmutability(t *testing.T) {
+	engine := NewEngine()
 	terminalStates := []core.RunState{
 		core.RunStateCompleted,
 		core.RunStateFailed,
@@ -27,7 +28,7 @@ func TestPropertyStateMachineTerminalImmutability(t *testing.T) {
 
 		for _, term := range terminalStates {
 			// Invariant: No transition out of a terminal state is ever permitted
-			if CanTransition(term, target) {
+			if engine.CanTransitionWorkflow(term, target) {
 				return false
 			}
 		}
@@ -40,6 +41,7 @@ func TestPropertyStateMachineTerminalImmutability(t *testing.T) {
 }
 
 func TestPropertyStepStateTerminalImmutability(t *testing.T) {
+	engine := NewEngine()
 	terminalStepStates := []core.StepState{
 		core.StepStateCompleted,
 		core.StepStateFailed,
@@ -61,7 +63,7 @@ func TestPropertyStepStateTerminalImmutability(t *testing.T) {
 	property := func(idx uint8) bool {
 		target := allStepStates[int(idx)%len(allStepStates)]
 		for _, term := range terminalStepStates {
-			if CanTransitionStep(term, target) {
+			if engine.CanTransitionStep(term, target) {
 				return false
 			}
 		}

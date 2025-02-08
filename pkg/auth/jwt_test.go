@@ -8,7 +8,7 @@ import (
 func TestJWTManagerSignAndVerify(t *testing.T) {
 	mgr := NewJWTManager("super-secret-key-12345")
 
-	claims := Claims{
+	claims := JWTClaims{
 		Subject:   "user-alex",
 		Role:      RoleAdmin,
 		TenantID:  "tenant-core",

@@ -1,7 +1,6 @@
 package core
 
 import (
-	"encoding/json"
 	"testing"
 )
 
@@ -76,10 +75,10 @@ func FuzzExpressionLexer(f *testing.F) {
 
 func FuzzJSONSchemaValidation(f *testing.F) {
 	schema := &JSONSchema{
-		Type: SchemaTypeObject,
+		Type: TypeObject,
 		Properties: map[string]*JSONSchema{
-			"id":   {Type: SchemaTypeInteger},
-			"name": {Type: SchemaTypeString},
+			"id":   {Type: TypeInteger},
+			"name": {Type: TypeString},
 		},
 		Required: []string{"id"},
 	}
@@ -96,9 +95,6 @@ func FuzzJSONSchemaValidation(f *testing.F) {
 	}
 
 	f.Fuzz(func(t *testing.T, payload []byte) {
-		var val interface{}
-		if err := json.Unmarshal(payload, &val); err == nil {
-			_ = schema.Validate(val)
-		}
+		_ = schema.Validate(payload)
 	})
 }

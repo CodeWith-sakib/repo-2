@@ -5,29 +5,25 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/kestrelflow/kestrelflow/pkg/plugin"
+	"github.com/kestrelflow/kestrelflow/pkg/worker"
 )
 
 func TestTransformPluginExecute(t *testing.T) {
 	p := NewTransformPlugin()
 
-	cfg, _ := json.Marshal(map[string]interface{}{
+	input, _ := json.Marshal(map[string]interface{}{
 		"expressions": map[string]string{
 			"userName": "user.name",
 			"status":   "data.items[0]",
 		},
-	})
-
-	input, _ := json.Marshal(map[string]interface{}{
 		"user": map[string]interface{}{"name": "Kestrel"},
 		"data": map[string]interface{}{
 			"items": []interface{}{"active", "pending"},
 		},
 	})
 
-	resp, err := p.Execute(context.Background(), plugin.ExecutionRequest{
-		Config: cfg,
-		Input:  input,
+	resp, err := p.Execute(context.Background(), worker.StepContext{
+		Input: input,
 	})
 	if err != nil {
 		t.Fatalf("execute failed: %v", err)

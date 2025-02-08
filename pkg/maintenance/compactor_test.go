@@ -10,18 +10,18 @@ import (
 )
 
 func TestHistoryCompactor(t *testing.T) {
-	store := memory.NewMemoryStore()
+	store := memory.NewStore()
 	ctx := context.Background()
 
-	wf := &core.Workflow{ID: core.NewID("wf"), Name: "test", Version: 1}
+	wf := &core.WorkflowDefinition{ID: core.NewID("wf"), Name: "test", Version: 1}
 	_ = store.CreateWorkflow(ctx, wf)
 
-	completedTime := time.Now().Add(-40 * 24 * time.Hour)
+	finishedTime := time.Now().Add(-40 * 24 * time.Hour)
 	run := &core.WorkflowRun{
-		ID:          core.NewID("run-old"),
-		WorkflowID:  wf.ID,
-		State:       core.RunStateCompleted,
-		CompletedAt: &completedTime,
+		ID:         core.NewID("run-old"),
+		WorkflowID: wf.ID,
+		State:      core.RunStateCompleted,
+		FinishedAt: &finishedTime,
 	}
 	_ = store.CreateRun(ctx, run)
 

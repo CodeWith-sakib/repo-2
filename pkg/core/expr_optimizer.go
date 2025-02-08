@@ -6,7 +6,7 @@ func NewASTOptimizer() *ASTOptimizer {
 	return &ASTOptimizer{}
 }
 
-func (o *ASTOptimizer) Optimize(node ExprNode) ExprNode {
+func (o *ASTOptimizer) Optimize(node Node) Node {
 	if node == nil {
 		return nil
 	}
@@ -29,21 +29,12 @@ func (o *ASTOptimizer) Optimize(node ExprNode) ExprNode {
 
 		return &BinaryOpNode{Op: n.Op, Left: left, Right: right}
 
-	case *UnaryOpNode:
-		expr := o.Optimize(n.Expr)
-		if lit, ok := expr.(*LiteralNode); ok {
-			if b, ok := lit.Value.(bool); ok && n.Op == TokenNot {
-				return &LiteralNode{Value: !b}
-			}
-		}
-		return &UnaryOpNode{Op: n.Op, Expr: expr}
-
 	default:
 		return node
 	}
 }
 
-func (o *ASTOptimizer) foldBinary(op TokenType, left, right interface{}) ExprNode {
+func (o *ASTOptimizer) foldBinary(op TokenType, left, right interface{}) Node {
 	switch op {
 	case TokenEqual:
 		return &LiteralNode{Value: left == right}
