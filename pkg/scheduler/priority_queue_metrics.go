@@ -3,6 +3,9 @@ package scheduler
 import (
 	"sync"
 	"time"
+
+	"github.com/kestrelflow/kestrelflow/pkg/core"
+	"github.com/kestrelflow/kestrelflow/pkg/storage"
 )
 
 type QueueMetrics struct {
@@ -14,53 +17,53 @@ type QueueMetrics struct {
 }
 
 type MonitoredPriorityQueue struct {
-	pq              *PriorityQueue
+	fq              *FairPriorityQueue
 	mu              sync.RWMutex
 	metrics         QueueMetrics
-	enqueueTimes    map[string]time.Time
+	enqueueTimes    map[core.ID]time.Time
 	totalWaitNanos  int64
 	waitedTaskCount int64
 }
 
-func NewMonitoredPriorityQueue(pq *PriorityQueue) *MonitoredPriorityQueue {
+func NewMonitoredPriorityQueue(fq *FairPriorityQueue) *MonitoredPriorityQueue {
 	return &MonitoredPriorityQueue{
-		pq:           pq,
-		enqueueTimes: make(map[string]time.Time),
+		fq:           fq,
+		enqueueTimes: make(map[core.ID]time.Time),
 	}
 }
 
-func (mq *MonitoredPriorityQueue) Push(item *QueueItem) {
+func (mq *MonitoredPriorityQueue) Push(task *storage.QueuedTask) {
 	mq.mu.Lock()
 	defer mq.mu.Unlock()
 
 	mq.metrics.TotalEnqueued++
-	mq.enqueueTimes[item.ID] = time.Now()
-	mq.pq.Push(item)
+	mq.enqueueTimes[task.ID] = time.Now()
+	mq.fq.Push(task)
 
-	if mq.pq.Len() > mq.metrics.HighWatermark {
-		mq.metrics.HighWatermark = mq.pq.Len()
+	if mq.fq.Len() > mq.metrics.HighWatermark {
+		mq.metrics.HighWatermark = mq.fq.Len()
 	}
 }
 
-func (mq *MonitoredPriorityQueue) Pop() *QueueItem {
+func (mq *MonitoredPriorityQueue) Pop() *storage.QueuedTask {
 	mq.mu.Lock()
 	defer mq.mu.Unlock()
 
-	item := mq.pq.Pop()
-	if item == nil {
+	task := mq.fq.Pop()
+	if task == nil {
 		return nil
 	}
 
 	mq.metrics.TotalDequeued++
-	if enqTime, exists := mq.enqueueTimes[item.ID]; exists {
-		delete(mq.enqueueTimes, item.ID)
+	if enqTime, exists := mq.enqueueTimes[task.ID]; exists {
+		delete(mq.enqueueTimes, task.ID)
 		wait := time.Since(enqTime)
 		mq.totalWaitNanos += wait.Nanoseconds()
 		mq.waitedTaskCount++
 		mq.metrics.AvgWaitDuration = time.Duration(mq.totalWaitNanos / mq.waitedTaskCount)
 	}
 
-	return item
+	return task
 }
 
 func (mq *MonitoredPriorityQueue) GetMetrics() QueueMetrics {

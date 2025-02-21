@@ -162,3 +162,7 @@ func Load(args []string) (*Config, error) {
 	cfg.ConfigFile = filePath
 	return &cfg, nil
 }
+
+func LoadConfigFile(filePath string) (*Config, error) {
+	return Load([]string{"-config", filePath})
+}

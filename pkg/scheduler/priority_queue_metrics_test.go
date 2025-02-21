@@ -5,17 +5,18 @@ import (
 	"time"
 
 	"github.com/kestrelflow/kestrelflow/pkg/core"
+	"github.com/kestrelflow/kestrelflow/pkg/storage"
 )
 
 func TestMonitoredPriorityQueue(t *testing.T) {
-	pq := NewPriorityQueue()
-	mq := NewMonitoredPriorityQueue(pq)
+	fq := NewFairPriorityQueue()
+	mq := NewMonitoredPriorityQueue(fq)
 
-	item1 := &QueueItem{ID: "task-1", Priority: core.PriorityHigh, ScheduledAt: time.Now()}
-	item2 := &QueueItem{ID: "task-2", Priority: core.PriorityNormal, ScheduledAt: time.Now()}
+	task1 := &storage.QueuedTask{ID: core.NewID("task-1"), Priority: core.PriorityHigh, ScheduledAt: time.Now()}
+	task2 := &storage.QueuedTask{ID: core.NewID("task-2"), Priority: core.PriorityNormal, ScheduledAt: time.Now()}
 
-	mq.Push(item1)
-	mq.Push(item2)
+	mq.Push(task1)
+	mq.Push(task2)
 
 	metrics := mq.GetMetrics()
 	if metrics.TotalEnqueued != 2 || metrics.HighWatermark != 2 {
@@ -23,7 +24,7 @@ func TestMonitoredPriorityQueue(t *testing.T) {
 	}
 
 	popped := mq.Pop()
-	if popped.ID != "task-1" {
+	if popped.ID != task1.ID {
 		t.Errorf("expected task-1, got %s", popped.ID)
 	}
 

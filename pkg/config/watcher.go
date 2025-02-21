@@ -81,7 +81,7 @@ func (w *ConfigWatcher) CheckOnce() (bool, error) {
 
 	if hash != w.lastHash {
 		w.lastHash = hash
-		cfg, err := LoadConfig(w.filePath)
+		cfg, err := LoadConfigFile(w.filePath)
 		if err != nil {
 			return false, fmt.Errorf("failed reloading config: %w", err)
 		}
