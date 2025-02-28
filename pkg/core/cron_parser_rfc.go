@@ -17,35 +17,23 @@ type ParsedCronSchedule struct {
 
 func (s *ParsedCronSchedule) Matches(t time.Time) bool {
 	t = t.UTC()
-	if !containsInt(s.Minutes, t.Minute()) {
+	if len(s.Minutes) > 0 && !containsInt(s.Minutes, t.Minute()) {
 		return false
 	}
-	if !containsInt(s.Hours, t.Hour()) {
+	if len(s.Hours) > 0 && !containsInt(s.Hours, t.Hour()) {
 		return false
 	}
-	if !containsInt(s.Days, t.Day()) {
+	if len(s.Days) > 0 && !containsInt(s.Days, t.Day()) {
 		return false
 	}
-	if !containsInt(s.Months, int(t.Month())) {
+	if len(s.Months) > 0 && !containsInt(s.Months, int(t.Month())) {
 		return false
 	}
 	weekday := int(t.Weekday())
-	if !containsInt(s.Weekdays, weekday) {
+	if len(s.Weekdays) > 0 && !containsInt(s.Weekdays, weekday) {
 		return false
 	}
 	return true
-}
-
-func containsInt(slice []int, val int) bool {
-	if len(slice) == 0 {
-		return true // wildcard
-	}
-	for _, item := range slice {
-		if item == val {
-			return true
-		}
-	}
-	return false
 }
 
 func ParseCronSpec(spec string) (*ParsedCronSchedule, error) {
