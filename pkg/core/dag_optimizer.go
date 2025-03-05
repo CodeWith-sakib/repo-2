@@ -25,16 +25,16 @@ func AnalyzeCriticalPath(dag *DAG, durations map[string]time.Duration) *Critical
 	sorted, _ := dag.TopologicalSort()
 
 	earliest := make(map[string]time.Duration)
-	for _, step := range sorted {
+	for _, stepID := range sorted {
 		var maxPred time.Duration
-		for _, pred := range dag.GetDependencies(step.ID) {
+		for _, pred := range dag.GetDependencies(stepID) {
 			predDur := durations[pred]
 			finish := earliest[pred] + predDur
 			if finish > maxPred {
 				maxPred = finish
 			}
 		}
-		earliest[step.ID] = maxPred
+		earliest[stepID] = maxPred
 	}
 
 	var maxProject time.Duration
@@ -47,10 +47,10 @@ func AnalyzeCriticalPath(dag *DAG, durations map[string]time.Duration) *Critical
 
 	latest := make(map[string]time.Duration)
 	for i := len(sorted) - 1; i >= 0; i-- {
-		step := sorted[i]
-		dependents := dag.GetDependents(step.ID)
+		stepID := sorted[i]
+		dependents := dag.GetDependents(stepID)
 		if len(dependents) == 0 {
-			latest[step.ID] = maxProject - durations[step.ID]
+			latest[stepID] = maxProject - durations[stepID]
 		} else {
 			minSucc := maxProject
 			for _, succ := range dependents {
@@ -59,7 +59,7 @@ func AnalyzeCriticalPath(dag *DAG, durations map[string]time.Duration) *Critical
 					minSucc = start
 				}
 			}
-			latest[step.ID] = minSucc - durations[step.ID]
+			latest[stepID] = minSucc - durations[stepID]
 		}
 	}
 
