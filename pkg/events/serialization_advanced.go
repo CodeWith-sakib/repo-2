@@ -25,11 +25,6 @@ func ToCloudEvent(e *core.Event, source string) (*CloudEvent, error) {
 		return nil, fmt.Errorf("cannot convert nil event to cloudevent")
 	}
 
-	payloadBytes, err := json.Marshal(e.Payload)
-	if err != nil {
-		return nil, fmt.Errorf("failed marshaling event payload: %w", err)
-	}
-
 	return &CloudEvent{
 		SpecVersion:     "1.0",
 		ID:              string(e.ID),
@@ -38,7 +33,7 @@ func ToCloudEvent(e *core.Event, source string) (*CloudEvent, error) {
 		Subject:         string(e.RunID),
 		Time:            e.Timestamp,
 		DataContentType: "application/json",
-		Data:            payloadBytes,
+		Data:            e.Payload,
 		Extensions: map[string]interface{}{
 			"tenant": string(e.TenantID),
 		},
@@ -50,13 +45,6 @@ func FromCloudEvent(ce *CloudEvent) (*core.Event, error) {
 		return nil, fmt.Errorf("unsupported or nil CloudEvent specification version")
 	}
 
-	var payload map[string]interface{}
-	if len(ce.Data) > 0 {
-		if err := json.Unmarshal(ce.Data, &payload); err != nil {
-			return nil, fmt.Errorf("failed unmarshaling cloudevent data: %w", err)
-		}
-	}
-
 	tenant, _ := ce.Extensions["tenant"].(string)
 
 	return &core.Event{
@@ -64,6 +52,6 @@ func FromCloudEvent(ce *CloudEvent) (*core.Event, error) {
 		RunID:     core.ID(ce.Subject),
 		TenantID:  tenant,
 		Timestamp: ce.Time,
-		Payload:   payload,
+		Payload:   ce.Data,
 	}, nil
 }

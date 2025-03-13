@@ -1,6 +1,7 @@
 package events
 
 import (
+	"encoding/json"
 	"testing"
 	"time"
 
@@ -14,9 +15,7 @@ func TestCloudEventConversionRoundtrip(t *testing.T) {
 		TenantID:  "tenant-alpha",
 		Type:      core.EventRunCompleted,
 		Timestamp: time.Now().UTC().Truncate(time.Millisecond),
-		Payload: map[string]interface{}{
-			"duration_ms": float64(1250),
-		},
+		Payload:   json.RawMessage(`{"duration_ms":1250}`),
 	}
 
 	ce, err := ToCloudEvent(evt, "/kestrel/engine/cluster-1")
