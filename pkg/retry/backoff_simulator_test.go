@@ -6,15 +6,9 @@ import (
 )
 
 func TestSimulateBackoff(t *testing.T) {
-	pol := Policy{
-		MaxAttempts:     5,
-		InitialInterval: 10 * time.Millisecond,
-		MaxInterval:     100 * time.Millisecond,
-		BackoffFactor:   2.0,
-		Jitter:          false,
-	}
+	strategy := NewExponentialBackoff(10*time.Millisecond, 100*time.Millisecond, 2.0, false)
 
-	res := SimulateBackoff(pol, 4)
+	res := SimulateBackoff(strategy, 4)
 	if res.Attempts != 4 {
 		t.Errorf("expected 4 attempts, got %d", res.Attempts)
 	}

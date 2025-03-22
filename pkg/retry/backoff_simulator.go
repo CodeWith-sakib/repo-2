@@ -13,13 +13,13 @@ type SimulationResult struct {
 	VarianceNanos  float64
 }
 
-func SimulateBackoff(policy Policy, attempts int) SimulationResult {
+func SimulateBackoff(strategy BackoffStrategy, attempts int) SimulationResult {
 	var total time.Duration
 	var maxInterval time.Duration
 	intervals := make([]time.Duration, attempts)
 
 	for i := 0; i < attempts; i++ {
-		d := policy.NextDelay(i + 1)
+		d := strategy.NextInterval(i + 1)
 		intervals[i] = d
 		total += d
 		if d > maxInterval {
