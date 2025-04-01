@@ -3,7 +3,6 @@ package worker
 import (
 	"context"
 	"sync"
-	"time"
 )
 
 type WorkerStealStats struct {

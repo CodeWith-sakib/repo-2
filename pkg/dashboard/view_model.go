@@ -1,7 +1,6 @@
 package dashboard
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/kestrelflow/kestrelflow/pkg/core"
@@ -16,7 +15,7 @@ type RunSummaryViewModel struct {
 	BadgeClass string
 }
 
-type DashboardViewModel struct {
+type DetailedDashboardViewModel struct {
 	TotalRuns     int
 	ActiveRuns    int
 	CompletedRuns int
@@ -24,8 +23,8 @@ type DashboardViewModel struct {
 	RecentRuns    []RunSummaryViewModel
 }
 
-func BuildDashboardViewModel(runs []*core.WorkflowRun) DashboardViewModel {
-	vm := DashboardViewModel{
+func BuildDetailedDashboardViewModel(runs []*core.WorkflowRun) DetailedDashboardViewModel {
+	vm := DetailedDashboardViewModel{
 		TotalRuns:  len(runs),
 		RecentRuns: make([]RunSummaryViewModel, 0, len(runs)),
 	}

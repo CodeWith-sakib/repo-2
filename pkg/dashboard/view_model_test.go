@@ -29,7 +29,7 @@ func TestBuildDashboardViewModel(t *testing.T) {
 		},
 	}
 
-	vm := BuildDashboardViewModel(runs)
+	vm := BuildDetailedDashboardViewModel(runs)
 	if vm.TotalRuns != 2 || vm.CompletedRuns != 1 || vm.FailedRuns != 1 {
 		t.Errorf("unexpected counts: %+v", vm)
 	}
