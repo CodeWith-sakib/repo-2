@@ -4,6 +4,19 @@ import (
 	"sync"
 )
 
+type Permission string
+
+const (
+	PermWorkflowRead  Permission = "workflow:read"
+	PermWorkflowWrite Permission = "workflow:write"
+	PermWorkflowAdmin Permission = "workflow:admin"
+	PermRunCreate     Permission = "run:create"
+	PermRunRead       Permission = "run:read"
+	PermRunCancel     Permission = "run:cancel"
+	PermEventRead     Permission = "event:read"
+	PermSystemAdmin   Permission = "system:admin"
+)
+
 type RoleNode struct {
 	Name        string
 	Permissions map[Permission]bool
