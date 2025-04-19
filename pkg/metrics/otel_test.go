@@ -9,7 +9,7 @@ func TestTracerSpanLifecycle(t *testing.T) {
 	tracer := NewTracer("kestrel-test", exp)
 
 	parentSpan, endParent := tracer.StartSpan("WorkflowExecution", nil)
-	childSpan, endChild := tracer.StartSpan("StepExecution", &parentSpan.Context)
+	_, endChild := tracer.StartSpan("StepExecution", &parentSpan.Context)
 
 	endChild("OK", map[string]interface{}{"step.id": "step-1"})
 	endParent("OK", map[string]interface{}{"workflow.id": "wf-1"})

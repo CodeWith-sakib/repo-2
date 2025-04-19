@@ -3,7 +3,6 @@ package metrics
 import (
 	"context"
 	"encoding/hex"
-	"fmt"
 	"math/rand"
 	"sync"
 	"time"
