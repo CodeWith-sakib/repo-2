@@ -16,12 +16,9 @@ func NewTextSummaryFormatter() *TextSummaryFormatter {
 
 func (f *TextSummaryFormatter) FormatMarkdown(run *core.WorkflowRun, steps []*core.StepRun) string {
 	var sb strings.Builder
-	sb.WriteString(fmt.Sprintf("## Workflow Run: %s
-", run.ID))
-	sb.WriteString(fmt.Sprintf("- **State**: `%s`
-", run.State))
-	sb.WriteString(fmt.Sprintf("- **Workflow**: `%s` (v%d)
-", run.WorkflowID, run.WorkflowVersion))
+	sb.WriteString(fmt.Sprintf("## Workflow Run: %s\n", run.ID))
+	sb.WriteString(fmt.Sprintf("- **State**: `%s`\n", run.State))
+	sb.WriteString(fmt.Sprintf("- **Workflow**: `%s` (v%d)\n", run.WorkflowID, run.Version))
 
 	duration := "N/A"
 	if run.StartedAt != nil {
@@ -31,24 +28,18 @@ func (f *TextSummaryFormatter) FormatMarkdown(run *core.WorkflowRun, steps []*co
 			duration = time.Since(*run.StartedAt).Round(time.Second).String()
 		}
 	}
-	sb.WriteString(fmt.Sprintf("- **Duration**: %s
+	sb.WriteString(fmt.Sprintf("- **Duration**: %s\n\n", duration))
 
-", duration))
-
-	sb.WriteString("### Step Execution Breakdown
-")
-	sb.WriteString("| Step ID | State | Retries | Duration |
-")
-	sb.WriteString("| :--- | :--- | :--- | :--- |
-")
+	sb.WriteString("### Step Execution Breakdown\n")
+	sb.WriteString("| Step ID | State | Attempt | Duration |\n")
+	sb.WriteString("| :--- | :--- | :--- | :--- |\n")
 
 	for _, s := range steps {
 		stepDuration := "-"
 		if s.StartedAt != nil && s.FinishedAt != nil {
 			stepDuration = s.FinishedAt.Sub(*s.StartedAt).Round(time.Millisecond).String()
 		}
-		sb.WriteString(fmt.Sprintf("| `%s` | `%s` | %d | %s |
-", s.StepID, s.State, s.RetryCount, stepDuration))
+		sb.WriteString(fmt.Sprintf("| `%s` | `%s` | %d | %s |\n", s.StepID, s.State, s.Attempt, stepDuration))
 	}
 
 	return sb.String()

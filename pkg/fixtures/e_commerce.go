@@ -1,6 +1,8 @@
 package fixtures
 
 import (
+	"encoding/json"
+
 	"github.com/kestrelflow/kestrelflow/pkg/core"
 )
 
@@ -14,37 +16,37 @@ func NewOrderFulfillmentPipeline() *core.WorkflowDefinition {
 			{
 				ID:       "validate_order",
 				TaskType: "transform",
-				Payload:  []byte(`{"rules":["check_stock","verify_billing_address"]}`),
+				Config:   json.RawMessage(`{"rules":["check_stock","verify_billing_address"]}`),
 			},
 			{
 				ID:        "reserve_inventory",
 				TaskType:  "sql",
 				DependsOn: []string{"validate_order"},
-				Payload:   []byte(`{"query":"UPDATE inventory SET reserved = reserved + 1 WHERE sku = 'PROD-99'"}`),
+				Config:    json.RawMessage(`{"query":"UPDATE inventory SET reserved = reserved + 1 WHERE sku = 'PROD-99'"}`),
 			},
 			{
 				ID:        "fraud_detection_probe",
 				TaskType:  "http",
 				DependsOn: []string{"validate_order"},
-				Payload:   []byte(`{"method":"POST","url":"https://fraud.internal/score"}`),
+				Config:    json.RawMessage(`{"method":"POST","url":"https://fraud.internal/score"}`),
 			},
 			{
 				ID:        "charge_payment",
 				TaskType:  "http",
 				DependsOn: []string{"reserve_inventory", "fraud_detection_probe"},
-				Payload:   []byte(`{"method":"POST","url":"https://payment.gateway/v1/charge"}`),
+				Config:    json.RawMessage(`{"method":"POST","url":"https://payment.gateway/v1/charge"}`),
 			},
 			{
 				ID:        "generate_invoice",
 				TaskType:  "shell",
 				DependsOn: []string{"charge_payment"},
-				Payload:   []byte(`{"command":"generate-pdf --invoice-id INV-100"}`),
+				Config:    json.RawMessage(`{"command":"generate-pdf --invoice-id INV-100"}`),
 			},
 			{
 				ID:        "dispatch_order",
 				TaskType:  "sql",
 				DependsOn: []string{"generate_invoice"},
-				Payload:   []byte(`{"query":"INSERT INTO shipments (order_id, status) VALUES ('ORD-1', 'QUEUED')"}`),
+				Config:    json.RawMessage(`{"query":"INSERT INTO shipments (order_id, status) VALUES ('ORD-1', 'QUEUED')"}`),
 			},
 		},
 	}

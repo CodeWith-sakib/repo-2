@@ -5,16 +5,18 @@ import (
 	"fmt"
 	"sync"
 	"time"
+
+	"github.com/kestrelflow/kestrelflow/pkg/worker"
 )
 
 type PluginTaskJob struct {
 	TaskType string
-	Payload  []byte
+	Context  worker.StepContext
 	ResultCh chan PluginTaskResult
 }
 
 type PluginTaskResult struct {
-	Output []byte
+	Result *worker.StepResult
 	Error  error
 }
 
@@ -67,8 +69,8 @@ func (p *PluginExecutorPool) workerLoop() {
 }
 
 func (p *PluginExecutorPool) executeJob(job PluginTaskJob) {
-	handler, exists := p.registry.Get(job.TaskType)
-	if !exists {
+	handler, err := p.registry.Get(job.TaskType)
+	if err != nil {
 		job.ResultCh <- PluginTaskResult{
 			Error: fmt.Errorf("unregistered task type: %s", job.TaskType),
 		}
@@ -78,10 +80,10 @@ func (p *PluginExecutorPool) executeJob(job PluginTaskJob) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	output, err := handler.Execute(ctx, job.Payload)
+	result, execErr := handler.Execute(ctx, job.Context)
 	job.ResultCh <- PluginTaskResult{
-		Output: output,
-		Error:  err,
+		Result: result,
+		Error:  execErr,
 	}
 }
 

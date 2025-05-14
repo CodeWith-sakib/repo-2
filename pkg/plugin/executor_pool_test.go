@@ -2,22 +2,30 @@ package plugin
 
 import (
 	"context"
+	"encoding/json"
 	"testing"
+
+	"github.com/kestrelflow/kestrelflow/pkg/worker"
 )
 
 type dummyHandler struct{}
 
-func (d *dummyHandler) Execute(ctx context.Context, payload []byte) ([]byte, error) {
-	return append([]byte("echo:"), payload...), nil
+func (d *dummyHandler) Type() string { return "dummy" }
+
+func (d *dummyHandler) Execute(ctx context.Context, sctx worker.StepContext) (*worker.StepResult, error) {
+	return &worker.StepResult{
+		Success: true,
+		Output:  sctx.Payload,
+	}, nil
 }
 
-func (d *dummyHandler) Validate(payload []byte) error {
+func (d *dummyHandler) ValidateConfig(config json.RawMessage) error {
 	return nil
 }
 
 func TestPluginExecutorPool(t *testing.T) {
 	reg := NewRegistry()
-	reg.Register("dummy", &dummyHandler{})
+	_ = reg.Register(&dummyHandler{})
 
 	pool := NewPluginExecutorPool(reg, 2, 10)
 	defer pool.Shutdown()
@@ -25,7 +33,7 @@ func TestPluginExecutorPool(t *testing.T) {
 	resCh := make(chan PluginTaskResult, 1)
 	job := PluginTaskJob{
 		TaskType: "dummy",
-		Payload:  []byte("hello"),
+		Context:  worker.StepContext{Payload: []byte("hello")},
 		ResultCh: resCh,
 	}
 
@@ -38,7 +46,7 @@ func TestPluginExecutorPool(t *testing.T) {
 		t.Fatalf("unexpected execution error: %v", res.Error)
 	}
 
-	if string(res.Output) != "echo:hello" {
-		t.Errorf("expected echo:hello, got %s", string(res.Output))
+	if string(res.Result.Output) != "hello" {
+		t.Errorf("expected hello, got %s", string(res.Result.Output))
 	}
 }

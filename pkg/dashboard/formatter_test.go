@@ -16,19 +16,19 @@ func TestTextSummaryFormatter(t *testing.T) {
 	end := now
 
 	run := &core.WorkflowRun{
-		ID:              core.NewID("run"),
-		WorkflowID:      core.NewID("wf"),
-		WorkflowVersion: 1,
-		State:           core.RunStateCompleted,
-		StartedAt:       &start,
-		FinishedAt:      &end,
+		ID:         core.NewID("run"),
+		WorkflowID: core.NewID("wf"),
+		Version:    1,
+		State:      core.RunStateCompleted,
+		StartedAt:  &start,
+		FinishedAt: &end,
 	}
 
 	steps := []*core.StepRun{
 		{
 			StepID:     "step-fetch",
 			State:      core.StepStateCompleted,
-			RetryCount: 1,
+			Attempt:    1,
 			StartedAt:  &start,
 			FinishedAt: &end,
 		},

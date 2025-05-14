@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"crypto/rand"
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
@@ -90,4 +91,11 @@ func (l *AuditLogger) Events() []*AuditEvent {
 
 func (evt *AuditEvent) ToJSON() ([]byte, error) {
 	return json.Marshal(evt)
+}
+
+
+func randomHex(bytesLen int) string {
+	b := make([]byte, bytesLen)
+	_, _ = rand.Read(b)
+	return hex.EncodeToString(b)
 }
