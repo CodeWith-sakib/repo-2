@@ -17,7 +17,7 @@ func TestOrderFulfillmentPipeline(t *testing.T) {
 		t.Fatalf("failed building DAG for order fulfillment pipeline: %v", err)
 	}
 
-	roots := dag.GetRootNodes()
+	roots := dag.RootNodes()
 	if len(roots) != 1 || roots[0] != "validate_order" {
 		t.Errorf("expected root step validate_order, got %v", roots)
 	}
