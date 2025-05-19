@@ -14,8 +14,7 @@ func (d *dummyHandler) Type() string { return "dummy" }
 
 func (d *dummyHandler) Execute(ctx context.Context, sctx worker.StepContext) (*worker.StepResult, error) {
 	return &worker.StepResult{
-		Success: true,
-		Output:  sctx.Payload,
+		Output: sctx.Input,
 	}, nil
 }
 
@@ -33,7 +32,7 @@ func TestPluginExecutorPool(t *testing.T) {
 	resCh := make(chan PluginTaskResult, 1)
 	job := PluginTaskJob{
 		TaskType: "dummy",
-		Context:  worker.StepContext{Payload: []byte("hello")},
+		Context:  worker.StepContext{Input: json.RawMessage(`"hello"`)},
 		ResultCh: resCh,
 	}
 
@@ -46,7 +45,7 @@ func TestPluginExecutorPool(t *testing.T) {
 		t.Fatalf("unexpected execution error: %v", res.Error)
 	}
 
-	if string(res.Result.Output) != "hello" {
-		t.Errorf("expected hello, got %s", string(res.Result.Output))
+	if string(res.Result.Output) != `"hello"` {
+		t.Errorf("expected "hello", got %s", string(res.Result.Output))
 	}
 }

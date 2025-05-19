@@ -2,6 +2,8 @@ package fixtures
 
 import (
 	"testing"
+
+	"github.com/kestrelflow/kestrelflow/pkg/core"
 )
 
 func TestOrderFulfillmentPipeline(t *testing.T) {
@@ -10,7 +12,7 @@ func TestOrderFulfillmentPipeline(t *testing.T) {
 		t.Fatalf("expected 6 steps in order fulfillment pipeline, got %d", len(wf.Steps))
 	}
 
-	dag, err := wf.BuildDAG()
+	dag, err := core.BuildDAG(wf.Steps)
 	if err != nil {
 		t.Fatalf("failed building DAG for order fulfillment pipeline: %v", err)
 	}
