@@ -46,6 +46,6 @@ func TestPluginExecutorPool(t *testing.T) {
 	}
 
 	if string(res.Result.Output) != `"hello"` {
-		t.Errorf("expected "hello", got %s", string(res.Result.Output))
+		t.Errorf("expected \"hello\", got %s", string(res.Result.Output))
 	}
 }
