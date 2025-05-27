@@ -1,0 +1,5 @@
+diff --git a/pkg/events/dedup.go b/pkg/events/dedup.go
+--- a/pkg/events/dedup.go
++++ b/pkg/events/dedup.go
+@@ -1,1 +1,1 @@
+-// Fix for DEFECT-014: Event Deduplicator Background Ticker Leak

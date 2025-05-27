@@ -1,0 +1,5 @@
+diff --git a/pkg/api/grpc/codec.go b/pkg/api/grpc/codec.go
+--- a/pkg/api/grpc/codec.go
++++ b/pkg/api/grpc/codec.go
+@@ -1,1 +1,1 @@
+-// Fix for DEFECT-021: gRPC Wire Codec Buffer Boundary Payload Truncation

@@ -1,0 +1,5 @@
+diff --git a/pkg/core/cycle_tarjan.go b/pkg/core/cycle_tarjan.go
+--- a/pkg/core/cycle_tarjan.go
++++ b/pkg/core/cycle_tarjan.go
+@@ -1,1 +1,1 @@
+-// Fix for DEFECT-024: Tarjan SCC Detector Self-Loop False Negative

@@ -1,0 +1,5 @@
+diff --git a/pkg/statemachine/step_state.go b/pkg/statemachine/step_state.go
+--- a/pkg/statemachine/step_state.go
++++ b/pkg/statemachine/step_state.go
+@@ -1,1 +1,1 @@
+-// Fix for DEFECT-005: Step Terminal Failed State Mutation Bypass

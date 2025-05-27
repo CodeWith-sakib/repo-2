@@ -1,0 +1,5 @@
+diff --git a/pkg/core/rate_limiter.go b/pkg/core/rate_limiter.go
+--- a/pkg/core/rate_limiter.go
++++ b/pkg/core/rate_limiter.go
+@@ -1,1 +1,1 @@
+-// Fix for DEFECT-016: Burst Capacity Duration Int32 Truncation Overflow

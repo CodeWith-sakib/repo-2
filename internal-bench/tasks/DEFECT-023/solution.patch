@@ -1,0 +1,5 @@
+diff --git a/pkg/scheduler/priority_queue_metrics.go b/pkg/scheduler/priority_queue_metrics.go
+--- a/pkg/scheduler/priority_queue_metrics.go
++++ b/pkg/scheduler/priority_queue_metrics.go
+@@ -1,1 +1,1 @@
+-// Fix for DEFECT-023: Queue High Watermark Undercount

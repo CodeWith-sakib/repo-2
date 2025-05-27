@@ -1,0 +1,5 @@
+diff --git a/pkg/core/template_macro.go b/pkg/core/template_macro.go
+--- a/pkg/core/template_macro.go
++++ b/pkg/core/template_macro.go
+@@ -1,1 +1,1 @@
+-// Fix for DEFECT-001: Macro Substring Truncation On Max Length

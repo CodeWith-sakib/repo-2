@@ -1,0 +1,5 @@
+diff --git a/pkg/api/http/middleware.go b/pkg/api/http/middleware.go
+--- a/pkg/api/http/middleware.go
++++ b/pkg/api/http/middleware.go
+@@ -1,1 +1,1 @@
+-// Fix for DEFECT-011: HTTP Middleware Drops Upstream Context Cancellation

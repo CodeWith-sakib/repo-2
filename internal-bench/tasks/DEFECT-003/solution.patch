@@ -1,0 +1,5 @@
+diff --git a/pkg/scheduler/fair_queue_quota.go b/pkg/scheduler/fair_queue_quota.go
+--- a/pkg/scheduler/fair_queue_quota.go
++++ b/pkg/scheduler/fair_queue_quota.go
+@@ -1,1 +1,1 @@
+-// Fix for DEFECT-003: Fair Queue Quota Off-By-One Enqueue Rejection

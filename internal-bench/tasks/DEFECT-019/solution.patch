@@ -1,0 +1,5 @@
+diff --git a/pkg/config/merger.go b/pkg/config/merger.go
+--- a/pkg/config/merger.go
++++ b/pkg/config/merger.go
+@@ -1,1 +1,1 @@
+-// Fix for DEFECT-019: DeepMerge Nested Overlay Key Deletion

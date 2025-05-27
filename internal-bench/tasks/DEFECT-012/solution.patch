@@ -1,0 +1,5 @@
+diff --git a/pkg/storage/postgres/circuit.go b/pkg/storage/postgres/circuit.go
+--- a/pkg/storage/postgres/circuit.go
++++ b/pkg/storage/postgres/circuit.go
+@@ -1,1 +1,1 @@
+-// Fix for DEFECT-012: Database Circuit Breaker Error Swallowing

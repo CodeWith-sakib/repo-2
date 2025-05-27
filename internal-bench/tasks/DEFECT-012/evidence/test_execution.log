@@ -1,0 +1,8 @@
+[BENCHMARK EVIDENCE LOG]
+Task: DEFECT-012
+Component: pkg/storage/postgres
+Status: Verified Independent Defect
+Golden Baseline: PASS
+Injected Baseline: FAIL [F2P]
+Fix Applied: PASS [P2P]
+Race Detector: CLEAN

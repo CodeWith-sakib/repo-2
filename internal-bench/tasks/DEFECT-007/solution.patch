@@ -1,0 +1,5 @@
+diff --git a/pkg/worker/priority_worker.go b/pkg/worker/priority_worker.go
+--- a/pkg/worker/priority_worker.go
++++ b/pkg/worker/priority_worker.go
+@@ -1,1 +1,1 @@
+-// Fix for DEFECT-007: Worker Work-Stealing Stats Data Race

@@ -1,0 +1,5 @@
+diff --git a/pkg/worker/deadline.go b/pkg/worker/deadline.go
+--- a/pkg/worker/deadline.go
++++ b/pkg/worker/deadline.go
+@@ -1,1 +1,1 @@
+-// Fix for DEFECT-010: Task Coordinator Cancels Root Context

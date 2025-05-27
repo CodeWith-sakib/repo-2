@@ -1,0 +1,5 @@
+diff --git a/pkg/events/serialization_advanced.go b/pkg/events/serialization_advanced.go
+--- a/pkg/events/serialization_advanced.go
++++ b/pkg/events/serialization_advanced.go
+@@ -1,1 +1,1 @@
+-// Fix for DEFECT-020: CloudEvents Serialization Subject Drop

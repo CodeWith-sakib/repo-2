@@ -1,0 +1,5 @@
+diff --git a/pkg/scheduler/throttler.go b/pkg/scheduler/throttler.go
+--- a/pkg/scheduler/throttler.go
++++ b/pkg/scheduler/throttler.go
+@@ -1,1 +1,1 @@
+-// Fix for DEFECT-008: Lock Ordering Inversion In Concurrency Governor
