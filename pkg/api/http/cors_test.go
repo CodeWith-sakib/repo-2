@@ -6,8 +6,8 @@ import (
 	"testing"
 )
 
-func TestCORSMiddleware(t *testing.T) {
-	handler := CORSMiddleware(CORSSettings{}, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func TestCustomCORSMiddleware(t *testing.T) {
+	handler := CustomCORSMiddleware(CORSSettings{}, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	}))
 	req := httptest.NewRequest("OPTIONS", "/api/v1/workflows", nil)

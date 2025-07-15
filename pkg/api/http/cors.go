@@ -9,7 +9,7 @@ type CORSSettings struct {
 	AllowedMethods []string
 }
 
-func CORSMiddleware(settings CORSSettings, next http.Handler) http.Handler {
+func CustomCORSMiddleware(settings CORSSettings, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
