@@ -2,28 +2,46 @@ package metrics
 
 import (
 	"testing"
-	"time"
 )
 
-func TestLatencyHistogramPercentiles(t *testing.T) {
-	hist := NewLatencyHistogram(100)
+func TestExplicitHistogram_ObserveAndQuantile(t *testing.T) {
+	bounds := []float64{10, 25, 50, 100, 250, 500, 1000}
+	h := NewExplicitHistogram("latency_ms", bounds, map[string]string{"service": "api"})
 
+	// Observe 100 values: 1..100
 	for i := 1; i <= 100; i++ {
-		hist.Record(time.Duration(i) * time.Millisecond)
+		h.Observe(float64(i))
 	}
 
-	p50 := hist.Percentile(50)
-	if p50 != 50*time.Millisecond {
-		t.Errorf("expected p50 of 50ms, got %v", p50)
+	buckets, sum, count := h.Snapshot()
+	if count != 100 {
+		t.Errorf("expected 100 observations, got %d", count)
+	}
+	if sum != 5050 {
+		t.Errorf("expected sum 5050, got %.1f", sum)
+	}
+	if len(buckets) == 0 {
+		t.Error("expected non-empty buckets")
 	}
 
-	p99 := hist.Percentile(99)
-	if p99 != 99*time.Millisecond {
-		t.Errorf("expected p99 of 99ms, got %v", p99)
+	// p50 of 1..100 should be around 50
+	p50 := h.Quantile(0.5)
+	if p50 < 45 || p50 > 55 {
+		t.Errorf("p50 out of expected range [45,55]: %.2f", p50)
 	}
 
-	mean := hist.Mean()
-	if mean != 50*time.Millisecond && mean != 50*time.Millisecond+500*time.Microsecond {
-		t.Errorf("unexpected mean: %v", mean)
+	// p95 should be around 95
+	p95 := h.Quantile(0.95)
+	if p95 < 90 || p95 > 100 {
+		t.Errorf("p95 out of expected range [90,100]: %.2f", p95)
+	}
+
+	mean := h.Mean()
+	if mean < 50.0 || mean > 51.0 {
+		t.Errorf("mean should be ~50.5, got %.2f", mean)
+	}
+
+	if h.String() == "" {
+		t.Error("String() should not be empty")
 	}
 }
