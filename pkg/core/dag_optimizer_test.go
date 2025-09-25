@@ -1,39 +1,61 @@
 package core
 
 import (
+	"reflect"
 	"testing"
-	"time"
 )
 
-func TestAnalyzeCriticalPath(t *testing.T) {
+func TestDAGOptimizer_TransitiveReduction(t *testing.T) {
+	// Graph:
+	// A -> B -> C
+	// A -> C (redundant edge!)
 	steps := []StepDefinition{
-		{ID: "A", DependsOn: []string{}},
-		{ID: "B", DependsOn: []string{"A"}},
-		{ID: "C", DependsOn: []string{"A"}},
-		{ID: "D", DependsOn: []string{"B", "C"}},
+		{ID: "A", TaskType: "shell"},
+		{ID: "B", TaskType: "shell", DependsOn: []string{"A"}},
+		{ID: "C", TaskType: "shell", DependsOn: []string{"A", "B"}},
 	}
-	dag, err := BuildDAG(steps)
+
+	opt := NewDAGOptimizer()
+	optimized, report, err := opt.Optimize(steps)
 	if err != nil {
-		t.Fatalf("failed building dag: %v", err)
+		t.Fatalf("optimize failed: %v", err)
 	}
 
-	durations := map[string]time.Duration{
-		"A": 10 * time.Second,
-		"B": 20 * time.Second,
-		"C": 5 * time.Second,
-		"D": 10 * time.Second,
+	if report.RemovedEdges != 1 {
+		t.Errorf("expected 1 removed edge, got %d", report.RemovedEdges)
 	}
 
-	cpa := AnalyzeCriticalPath(dag, durations)
-	// Critical path: A -> B -> D (10 + 20 + 10 = 40s)
-	if cpa.TotalDuration != 40*time.Second {
-		t.Errorf("expected total duration 40s, got %v", cpa.TotalDuration)
+	// C should now only depend on B
+	for _, s := range optimized {
+		if s.ID == "C" {
+			expectedDeps := []string{"B"}
+			if !reflect.DeepEqual(s.DependsOn, expectedDeps) {
+				t.Errorf("expected C deps %v, got %v", expectedDeps, s.DependsOn)
+			}
+		}
+	}
+}
+
+func TestDAGOptimizer_RootsAndTerminals(t *testing.T) {
+	steps := []StepDefinition{
+		{ID: "root1", TaskType: "shell"},
+		{ID: "root2", TaskType: "shell"},
+		{ID: "mid", TaskType: "shell", DependsOn: []string{"root1", "root2"}},
+		{ID: "leaf1", TaskType: "shell", DependsOn: []string{"mid"}},
+		{ID: "leaf2", TaskType: "shell", DependsOn: []string{"mid"}},
 	}
 
-	if !cpa.Schedule["B"].IsCritical {
-		t.Error("expected step B to be critical")
+	opt := NewDAGOptimizer()
+	roots := opt.FindRoots(steps)
+	terminals := opt.FindTerminals(steps)
+
+	expectedRoots := []string{"root1", "root2"}
+	if !reflect.DeepEqual(roots, expectedRoots) {
+		t.Errorf("expected roots %v, got %v", expectedRoots, roots)
 	}
-	if cpa.Schedule["C"].IsCritical {
-		t.Error("expected step C not to be critical")
+
+	expectedTerminals := []string{"leaf1", "leaf2"}
+	if !reflect.DeepEqual(terminals, expectedTerminals) {
+		t.Errorf("expected terminals %v, got %v", expectedTerminals, terminals)
 	}
 }
