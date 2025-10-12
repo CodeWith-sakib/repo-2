@@ -5,27 +5,48 @@ import (
 	"testing"
 )
 
-func TestDAGVisualizer(t *testing.T) {
-	steps := []StepDefinition{
-		{ID: "step-1", TaskType: "http"},
-		{ID: "step-2", TaskType: "shell", DependsOn: []string{"step-1"}},
-		{ID: "step-3", TaskType: "shell", DependsOn: []string{"step-2"}},
-	}
-	dag, _ := BuildDAG(steps)
-	vis := NewDAGVisualizer(dag)
-
-	dot := vis.ToDOT()
-	if !strings.Contains(dot, "digraph WorkflowDAG") || !strings.Contains(dot, `"step-1" -> "step-2"`) {
-		t.Errorf("unexpected DOT output: %s", dot)
+func TestGraphVisualizer_ToDOT(t *testing.T) {
+	wf := &WorkflowDefinition{
+		Name:    "PaymentFlow",
+		Version: 1,
+		Steps: []StepDefinition{
+			{ID: "charge", TaskType: "http"},
+			{ID: "receipt", TaskType: "email", DependsOn: []string{"charge"}},
+		},
 	}
 
-	mermaid := vis.ToMermaid()
-	if !strings.Contains(mermaid, "graph LR") || !strings.Contains(mermaid, "step-1 --> step-2") {
-		t.Errorf("unexpected Mermaid output: %s", mermaid)
+	vis := NewGraphVisualizer()
+	dot := vis.ToDOT(wf)
+
+	if !strings.Contains(dot, `digraph "PaymentFlow"`) {
+		t.Errorf("expected digraph header, got: %s", dot)
+	}
+	if !strings.Contains(dot, `"charge" -> "receipt"`) {
+		t.Errorf("expected edge from charge to receipt, got: %s", dot)
+	}
+}
+
+func TestGraphVisualizer_ToASCII(t *testing.T) {
+	wf := &WorkflowDefinition{
+		Name:    "LinearTree",
+		Version: 2,
+		Steps: []StepDefinition{
+			{ID: "start", TaskType: "shell"},
+			{ID: "middle", TaskType: "shell", DependsOn: []string{"start"}},
+			{ID: "end", TaskType: "shell", DependsOn: []string{"middle"}},
+		},
 	}
 
-	ascii := vis.ToASCII()
-	if !strings.Contains(ascii, "Workflow DAG:") || !strings.Contains(ascii, "[step-1 (http)]") {
-		t.Errorf("unexpected ASCII output: %s", ascii)
+	vis := NewGraphVisualizer()
+	ascii := vis.ToASCII(wf)
+
+	if !strings.Contains(ascii, "Workflow: LinearTree (v2)") {
+		t.Errorf("missing header in ascii: %s", ascii)
+	}
+	if !strings.Contains(ascii, "• start") {
+		t.Errorf("missing root in ascii: %s", ascii)
+	}
+	if !strings.Contains(ascii, "└─ middle") {
+		t.Errorf("missing middle in ascii: %s", ascii)
 	}
 }

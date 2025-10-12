@@ -2,31 +2,47 @@ package core
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 )
 
-type DAGVisualizer struct {
-	dag *DAG
+// GraphVisualizer generates Graphviz DOT and ASCII text representations of workflow DAGs.
+type GraphVisualizer struct{}
+
+// NewGraphVisualizer creates a visualizer instance.
+func NewGraphVisualizer() *GraphVisualizer {
+	return &GraphVisualizer{}
 }
 
-func NewDAGVisualizer(dag *DAG) *DAGVisualizer {
-	return &DAGVisualizer{dag: dag}
-}
-
-func (v *DAGVisualizer) ToDOT() string {
+// ToDOT formats a workflow definition into Graphviz DOT language.
+func (v *GraphVisualizer) ToDOT(wf *WorkflowDefinition) string {
 	var sb strings.Builder
-	sb.WriteString("digraph WorkflowDAG {\n")
+	sb.WriteString(fmt.Sprintf("digraph %q {\n", wf.Name))
 	sb.WriteString("  rankdir=LR;\n")
-	sb.WriteString("  node [shape=box, style=rounded, fontname=\"sans-serif\"];\n")
+	sb.WriteString("  node [shape=box, style=rounded, fontname=\"Helvetica\"];\n")
+	sb.WriteString("  edge [fontname=\"Helvetica\"];\n\n")
 
-	nodes := v.dag.Nodes()
-	for _, n := range nodes {
-		sb.WriteString(fmt.Sprintf("  \"%s\" [label=\"%s\\n(%s)\"];\n", n.ID, n.ID, n.TaskType))
+	// Sort steps for deterministic output
+	steps := make([]StepDefinition, len(wf.Steps))
+	copy(steps, wf.Steps)
+	sort.Slice(steps, func(i, j int) bool {
+		return steps[i].ID < steps[j].ID
+	})
+
+	// Nodes
+	for _, s := range steps {
+		sb.WriteString(fmt.Sprintf("  %q [label=%q];\n", s.ID, fmt.Sprintf("%s\\n(%s)", s.ID, s.TaskType)))
 	}
+	sb.WriteString("\n")
 
-	for _, n := range nodes {
-		for _, dep := range n.DependsOn {
-			sb.WriteString(fmt.Sprintf("  \"%s\" -> \"%s\";\n", dep, n.ID))
+	// Edges
+	for _, s := range steps {
+		sortedDeps := make([]string, len(s.DependsOn))
+		copy(sortedDeps, s.DependsOn)
+		sort.Strings(sortedDeps)
+
+		for _, dep := range sortedDeps {
+			sb.WriteString(fmt.Sprintf("  %q -> %q;\n", dep, s.ID))
 		}
 	}
 
@@ -34,54 +50,47 @@ func (v *DAGVisualizer) ToDOT() string {
 	return sb.String()
 }
 
-func (v *DAGVisualizer) ToMermaid() string {
-	var sb strings.Builder
-	sb.WriteString("graph LR\n")
-
-	nodes := v.dag.Nodes()
-	for _, n := range nodes {
-		sb.WriteString(fmt.Sprintf("    %s[\"%s<br/>(%s)\"]\n", n.ID, n.ID, n.TaskType))
+// ToASCII generates an indented hierarchy tree from root nodes down to leaves.
+func (v *GraphVisualizer) ToASCII(wf *WorkflowDefinition) string {
+	steps := wf.Steps
+	dag, err := BuildDAG(steps)
+	if err != nil {
+		return fmt.Sprintf("Error building DAG: %v", err)
 	}
 
-	for _, n := range nodes {
-		for _, dep := range n.DependsOn {
-			sb.WriteString(fmt.Sprintf("    %s --> %s\n", dep, n.ID))
+	// Find roots (steps with no dependencies)
+	var roots []string
+	for _, s := range steps {
+		if len(s.DependsOn) == 0 {
+			roots = append(roots, s.ID)
 		}
 	}
+	sort.Strings(roots)
 
-	return sb.String()
-}
-
-func (v *DAGVisualizer) ToASCII() string {
-	roots := v.dag.RootNodes()
 	var sb strings.Builder
-	sb.WriteString("Workflow DAG:\n")
+	sb.WriteString(fmt.Sprintf("Workflow: %s (v%d)\n", wf.Name, wf.Version))
 
+	visited := make(map[string]bool)
 	for _, r := range roots {
-		v.renderASCIINode(&sb, r, "", true)
+		v.renderASCIINode(&sb, r, dag, 0, visited)
 	}
+
 	return sb.String()
 }
 
-func (v *DAGVisualizer) renderASCIINode(sb *strings.Builder, nodeID, prefix string, isTail bool) {
-	node, exists := v.dag.GetNode(nodeID)
-	if !exists {
-		return
+func (v *GraphVisualizer) renderASCIINode(sb *strings.Builder, id string, dag *DAG, depth int, visited map[string]bool) {
+	indent := strings.Repeat("  ", depth)
+	prefix := "└─ "
+	if depth == 0 {
+		prefix = "• "
 	}
 
-	connector := "├── "
-	if isTail {
-		connector = "└── "
-	}
+	sb.WriteString(fmt.Sprintf("%s%s%s\n", indent, prefix, id))
 
-	sb.WriteString(fmt.Sprintf("%s%s[%s (%s)]\n", prefix, connector, node.ID, node.TaskType))
+	dependents := dag.GetDependents(id)
+	sort.Strings(dependents)
 
-	dependents := v.dag.GetDependents(nodeID)
-	for i, dep := range dependents {
-		childPrefix := prefix + "│   "
-		if isTail {
-			childPrefix = prefix + "    "
-		}
-		v.renderASCIINode(sb, dep, childPrefix, i == len(dependents)-1)
+	for _, child := range dependents {
+		v.renderASCIINode(sb, child, dag, depth+1, visited)
 	}
 }
