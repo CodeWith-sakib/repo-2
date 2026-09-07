@@ -1,0 +1,44 @@
+# Binaries and build artifacts
+bin/
+dist/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test and coverage artifacts
+*.out
+*.test
+*.prof
+coverage.html
+coverage.txt
+
+# Local environment configuration
+.env
+.env.local
+.env.*.local
+
+# Operating system and editor files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+
+# Local archives and bundles
+*.zip
+*.tar.gz
+*.tgz
+
+# Internal development, audit, and generation artifacts
+AUDIT.md
+ENHANCEMENT_PLAN.md
+PLAN.md

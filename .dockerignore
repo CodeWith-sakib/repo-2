@@ -1,0 +1,34 @@
+# Version control and editor metadata
+.git
+.github
+.idea
+.vscode
+.DS_Store
+*.swp
+*~
+
+# Build output and temporary artifacts
+bin
+dist
+*.out
+*.test
+*.prof
+coverage.html
+coverage.txt
+
+# Local environment configuration
+.env
+.env.*
+!.env.example
+
+# Local archives and bundles
+*.zip
+*.tar.gz
+*.tgz
+
+# Internal development notes
+AUDIT.md
+ENHANCEMENT_PLAN.md
+PLAN.md
+generator
+internal-bench
